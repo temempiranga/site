@@ -48,6 +48,19 @@ Edite `data/comercios.json` seguindo o modelo:
 
 O site é hospedado no **Cloudflare Pages** com deploy automático a cada push na branch `main`.
 
+## Formulário de contato com Turnstile
+
+O formulário de contato usa **Cloudflare Turnstile** para validar envios em `/api/contact`.
+
+Configure estas variáveis no Cloudflare Pages:
+
+```txt
+TURNSTILE_SITE_KEY=site key do widget
+TURNSTILE_SECRET_KEY=secret key usada no siteverify
+```
+
+A `TURNSTILE_SITE_KEY` é lida pelo front via `/api/turnstile-config`. A `TURNSTILE_SECRET_KEY` fica apenas na Function server-side e nunca deve ser exposta no HTML ou JavaScript público.
+
 ## Licença e dados
 
 © 2025 Tem em Piranga — Todos os direitos reservados.  

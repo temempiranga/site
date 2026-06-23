@@ -21,12 +21,19 @@ const ICONES_CAT = {
 let todosOsNegocios = [];
 let categoriaAtiva  = 'Todos';
 let termoBusca      = '';
+let turnstileSiteKey = '';
+let turnstileWidgetId = null;
+
+window.onTurnstileLoad = renderTurnstileWidget;
 
 /* ─── init ───────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   renderCategorias();
   await carregarNegocios();
   bindBusca();
+  bindContato();
+  await carregarTurnstileConfig();
+  renderTurnstileWidget();
 });
 
 /* ─── carrega dados ──────────────────────────────────── */
@@ -153,6 +160,75 @@ function bindBusca() {
   input.addEventListener('keydown', e => { if (e.key === 'Enter') executar(); });
   input.addEventListener('input', () => {
     if (input.value === '') { termoBusca = ''; renderCards(); }
+  });
+}
+
+/* ─── contato + turnstile ───────────────────────────── */
+function bindContato() {
+  const form = document.getElementById('contato-form');
+  const status = document.getElementById('contato-status');
+  if (!form || !status) return;
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const formData = new FormData(form);
+
+    status.textContent = '';
+    status.className = 'form-status';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    try {
+      const resp = await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        throw new Error(data.message || 'Não foi possível enviar sua mensagem.');
+      }
+
+      form.reset();
+      if (window.turnstile) window.turnstile.reset();
+      status.textContent = data.message || 'Mensagem enviada com sucesso.';
+      status.classList.add('sucesso');
+    } catch (err) {
+      status.textContent = err.message;
+      status.classList.add('erro');
+      if (window.turnstile) window.turnstile.reset();
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar mensagem';
+    }
+  });
+}
+
+async function carregarTurnstileConfig() {
+  const widget = document.getElementById('turnstile-widget');
+  if (!widget) return;
+
+  try {
+    const resp = await fetch('/api/turnstile-config');
+    const data = await resp.json();
+    if (!resp.ok || !data.siteKey) {
+      throw new Error(data.message || 'Turnstile não configurado.');
+    }
+    turnstileSiteKey = data.siteKey;
+  } catch (err) {
+    widget.innerHTML = `<p class="form-status erro">${escapeHtml(err.message)}</p>`;
+  }
+}
+
+function renderTurnstileWidget() {
+  const widget = document.getElementById('turnstile-widget');
+  if (!widget || !turnstileSiteKey || !window.turnstile || turnstileWidgetId !== null) return;
+
+  turnstileWidgetId = window.turnstile.render(widget, {
+    sitekey: turnstileSiteKey,
+    theme: 'light',
   });
 }
 
