@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+
+  <title>Página não encontrada — Tem em Piranga</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📍</text></svg>" />
+  <style>
+    .erro-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 60vh;
+      padding: 40px 20px;
+    }
+    .erro-codigo {
+      font-family: var(--fonte-display);
+      font-size: clamp(4rem, 15vw, 8rem);
+      font-weight: 700;
+      color: var(--cinza-borda);
+      line-height: 1;
+    }
+    .erro-titulo {
+      font-family: var(--fonte-display);
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+      font-weight: 700;
+      color: var(--carvao);
+      margin: 12px 0 8px;
+    }
+    .erro-desc {
+      font-size: 0.95rem;
+      color: #666;
+      max-width: 400px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .erro-rayid {
+      font-size: 0.72rem;
+      color: #aaa;
+      margin-top: 20px;
+      word-break: break-all;
+    }
+    .btn-voltar {
+      display: inline-block;
+      background: var(--verde);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 11px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: var(--fonte-display);
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-voltar:hover { background: var(--verde-dark); }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <a href="/" style="text-decoration:none">
+      <div class="logo">Tem em <span>Piranga</span></div>
+      <div class="header-sub">Guia de comércios e serviços</div>
+    </a>
+  </header>
+
+  <div class="erro-container">
+    <div class="erro-codigo">404</div>
+    <h1 class="erro-titulo">Página não encontrada</h1>
+    <p class="erro-desc">
+      A página que você procura não existe ou foi movida.
+      Volte para o guia e encontre o que precisa em Piranga.
+    </p>
+    <a href="/" class="btn-voltar">Voltar para o início</a>
+    <p class="erro-rayid" id="rayid"></p>
+  </div>
+
+  <footer class="footer">
+    <p>temempiranga.com.br · Piranga, Minas Gerais</p>
+    <p style="margin-top:6px;font-size:.7rem">&copy; 2025 Tem em Piranga · Todos os direitos reservados</p>
+  </footer>
+
+  <script>
+    (function () {
+      var match = document.cookie.match(/(__cf_ray|cf-ray)=([^;]+)/);
+      if (!match) {
+        var meta = document.querySelector('meta[name="cf-ray"]');
+        if (meta) match = [null, null, meta.content];
+      }
+      if (match && match[2]) {
+        document.getElementById('rayid').textContent = 'Ray ID: ' + match[2];
+      }
+    })();
+  </script>
+
+</body>
+</html>

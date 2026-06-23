@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Guia digital de comércios e serviços de Piranga-MG. Encontre rapidamente o que você precisa e fale direto com o anunciante." />
+
+  <!-- SEO -->
+  <meta property="og:title" content="Tem em Piranga — Guia de comércios e serviços" />
+  <meta property="og:description" content="Encontre comércios, prestadores de serviço e profissionais de Piranga-MG." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://temempiranga.com.br" />
+
+  <!-- Segurança -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self';
+    style-src 'self' https://fonts.googleapis.com;
+    font-src https://fonts.gstatic.com;
+    img-src 'self' data:;
+    connect-src 'self';
+    frame-ancestors 'none';
+  " />
+
+  <title>Tem em Piranga — Guia de comércios e serviços</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📍</text></svg>" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <div class="logo">Tem em <span>Piranga</span></div>
+      <div class="header-sub">Guia de comércios e serviços</div>
+    </div>
+    <a
+      class="btn-anuncie-header"
+      href="https://wa.me/5531999999000?text=Olá!%20Quero%20anunciar%20meu%20negócio%20no%20Tem%20em%20Piranga."
+      target="_blank"
+      rel="noopener noreferrer"
+    >Anuncie aqui</a>
+  </header>
+
+  <!-- Hero + busca -->
+  <section class="hero" aria-label="Busca de comércios">
+    <h1 class="hero-titulo">
+      Tem <em>isso</em> em Piranga?<br>A gente sabe onde fica.
+    </h1>
+    <p class="hero-sub">Comércios, serviços e profissionais da cidade — fale direto com quem você precisa.</p>
+    <div class="busca-wrap" role="search">
+      <label for="busca-input" class="sr-only">Buscar comércio ou serviço</label>
+      <input
+        type="search"
+        id="busca-input"
+        placeholder="Busque um comércio ou serviço..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="busca-btn" id="busca-btn" aria-label="Buscar">Buscar</button>
+    </div>
+  </section>
+
+  <!-- Categorias -->
+  <nav class="categorias" id="categorias" aria-label="Filtrar por categoria"></nav>
+
+  <!-- Conteúdo principal -->
+  <main class="main">
+    <p class="resultados-info" id="resultados-info" aria-live="polite"></p>
+
+    <div class="cards-grid" id="cards-grid" aria-label="Lista de negócios">
+      <p style="color:#999;font-size:.9rem">Carregando...</p>
+    </div>
+
+    <div class="vazio" id="vazio" role="status">
+      <span style="font-size:2.5rem">🔍</span>
+      <p>Nenhum resultado encontrado.<br>Tente outro termo ou categoria.</p>
+    </div>
+
+    <!-- Banner anuncie -->
+    <div class="banner-anuncie" aria-label="Anuncie seu negócio">
+      <div class="banner-anuncie-txt">
+        <strong>Seu negócio aparece aqui! 📍</strong>
+        <p>Junte-se ao guia mais completo de Piranga e alcance quem precisa de você.</p>
+      </div>
+      <a
+        class="btn-anuncie-banner"
+        href="https://wa.me/5531999999000?text=Olá!%20Quero%20anunciar%20meu%20negócio%20no%20Tem%20em%20Piranga."
+        target="_blank"
+        rel="noopener noreferrer"
+      >Quero anunciar →</a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>temempiranga.com.br · Piranga, Minas Gerais</p>
+    <p><a href="https://wa.me/5531999999000" target="_blank" rel="noopener noreferrer">contato@temempiranga.com.br</a></p>
+    <p style="margin-top:6px;font-size:.7rem">© 2025 Tem em Piranga · Todos os direitos reservados</p>
+  </footer>
+
+  <!-- Acessibilidade: classe sr-only -->
+  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

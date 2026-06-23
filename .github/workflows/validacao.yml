@@ -1,0 +1,50 @@
+name: Validação do site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Verificar estrutura de arquivos obrigatórios
+        run: |
+          files=("index.html" "css/style.css" "js/main.js" "data/comercios.json" "_headers" "_redirects")
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "❌ Arquivo obrigatório não encontrado: $f"
+              exit 1
+            fi
+          done
+          echo "✅ Todos os arquivos obrigatórios presentes"
+
+      - name: Validar JSON dos comércios
+        run: |
+          python3 -c "
+          import json, sys
+          with open('data/comercios.json') as f:
+            data = json.load(f)
+          campos = ['id','nome','categoria','descricao','telefone','whatsapp','horario','bairro','entrega_rural','destaque','ativo']
+          for i, item in enumerate(data):
+            for campo in campos:
+              if campo not in item:
+                print(f'❌ Campo \"{campo}\" ausente no item {i}: {item.get(\"nome\",\"?\")}')
+                sys.exit(1)
+          print(f'✅ JSON válido com {len(data)} negócio(s)')
+          "
+
+      - name: Verificar ausência de dados sensíveis no código
+        run: |
+          if grep -rn --include="*.js" --include="*.html" \
+            -e "password" -e "senha" -e "api_key" -e "API_KEY" \
+            -e "secret" -e "token" .; then
+            echo "⚠️  Possível dado sensível encontrado no código. Revise antes de continuar."
+            exit 1
+          fi
+          echo "✅ Nenhum dado sensível detectado"

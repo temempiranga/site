@@ -1,0 +1,3 @@
+# Redirects de domínio gerenciados nas Cloudflare Rules
+# 404 customizado servido pelo Cloudflare Pages
+/* /404.html 404
