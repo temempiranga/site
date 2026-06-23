@@ -1,0 +1,32 @@
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dados sensíveis — NUNCA subir
+.env
+.env.local
+*.env
+secrets.json
+config.local.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependências (se usar npm futuramente)
+node_modules/
+
+# Build (se usar bundler futuramente)
+dist/
+build/
+
+# Temporários
+*.tmp
+*.bak
