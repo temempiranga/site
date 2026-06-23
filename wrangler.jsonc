@@ -1,10 +1,12 @@
 {
   "name": "site",
+  "main": "src/worker.js",
   "compatibility_date": "2026-06-23",
   // Keep Cloudflare preview URLs available for non-production deployments.
   "preview_urls": true,
   "assets": {
-    "directory": "./"
+    "directory": "./",
+    "binding": "ASSETS"
   },
   "observability": {
     "enabled": true

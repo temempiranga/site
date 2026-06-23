@@ -1,8 +1,38 @@
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
-export async function onRequest(context) {
-  const { request, env } = context;
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
 
+    if (url.pathname === '/api/turnstile-config') {
+      return handleTurnstileConfig(request, env);
+    }
+
+    if (url.pathname === '/api/contact') {
+      return handleContact(request, env);
+    }
+
+    return env.ASSETS.fetch(request);
+  },
+};
+
+function handleTurnstileConfig(request, env) {
+  if (request.method !== 'GET') {
+    return jsonResponse({ message: 'Método não permitido.' }, 405, {
+      Allow: 'GET',
+    });
+  }
+
+  if (!env.TURNSTILE_SITE_KEY) {
+    return jsonResponse({ message: 'TURNSTILE_SITE_KEY não configurada.' }, 500);
+  }
+
+  return jsonResponse({ siteKey: env.TURNSTILE_SITE_KEY }, 200, {
+    'Cache-Control': 'no-store',
+  });
+}
+
+async function handleContact(request, env) {
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
@@ -103,7 +133,7 @@ function jsonResponse(payload, status = 200, extraHeaders = {}) {
 function corsHeaders() {
   return {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 }
