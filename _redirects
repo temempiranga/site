@@ -1,3 +1,2 @@
 # Redirects de domínio gerenciados nas Cloudflare Rules
-# 404 customizado servido pelo Cloudflare Pages
-/* /404.html 404
+# 404 customizado servido automaticamente pelo Cloudflare Pages via 404.html
