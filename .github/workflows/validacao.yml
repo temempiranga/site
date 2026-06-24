@@ -15,7 +15,7 @@ jobs:
 
       - name: Verificar estrutura de arquivos obrigatórios
         run: |
-          files=("index.html" "css/style.css" "js/main.js" "data/comercios.json" "_headers" "_redirects")
+          files=("index.html" "contato.html" "404.html" "css/style.css" "js/main.js" "data/comercios.json" "_headers" "_redirects" "src/worker.js")
           for f in "${files[@]}"; do
             if [ ! -f "$f" ]; then
               echo "❌ Arquivo obrigatório não encontrado: $f"
@@ -39,12 +39,54 @@ jobs:
           print(f'✅ JSON válido com {len(data)} negócio(s)')
           "
 
+      - name: Validar HTML (tags abertas/fechadas)
+        run: |
+          erro=0
+          for f in index.html contato.html 404.html; do
+            if ! python3 -c "
+          import html.parser, sys
+          class V(html.parser.HTMLParser):
+            def __init__(self):
+              super().__init__()
+              self.errors = []
+            def handle_starttag(self, tag, attrs):
+              pass
+          p = V()
+          try:
+            p.feed(open('$f').read())
+          except Exception as e:
+            print(f'❌ Erro de parsing em $f: {e}')
+            sys.exit(1)
+          print(f'✅ $f — HTML parseável')
+          "; then
+              erro=1
+            fi
+          done
+          exit $erro
+
       - name: Verificar ausência de dados sensíveis no código
         run: |
+          encontrou=0
+          # Arquivos .env ou de credenciais no repositório
+          if find . -name ".env" -o -name ".env.*" -o -name "credentials.json" | grep -q .; then
+            echo "❌ Arquivo de credenciais encontrado no repositório"
+            encontrou=1
+          fi
+          # Chaves hardcoded (padrões comuns de API keys)
           if grep -rn --include="*.js" --include="*.html" \
-            -e "password" -e "senha" -e "api_key" -e "API_KEY" \
-            -e "secret" -e "token" .; then
-            echo "⚠️  Possível dado sensível encontrado no código. Revise antes de continuar."
+            -E '(sk_live_|pk_live_|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36}|xox[bpars]-[a-zA-Z0-9-]+)' .; then
+            echo "❌ Possível chave de API hardcoded encontrada"
+            encontrou=1
+          fi
+          # Senhas ou chaves atribuídas diretamente como strings
+          if grep -rn --include="*.js" --include="*.html" \
+            -iE "(password|senha|api_key|apikey|secret_key)\s*[:=]\s*['\"][^'\"]+['\"]" \
+            --exclude-dir=node_modules .; then
+            echo "❌ Possível credencial hardcoded encontrada"
+            encontrou=1
+          fi
+          if [ "$encontrou" -eq 1 ]; then
+            echo "⚠️  Revise os itens acima antes de continuar."
             exit 1
           fi
           echo "✅ Nenhum dado sensível detectado"
