@@ -48,6 +48,29 @@ Edite `data/comercios.json` seguindo o modelo:
 
 O site é hospedado no **Cloudflare Pages** com deploy automático a cada push na branch `main`.
 
+## Formulário de contato com Turnstile
+
+O formulário de contato usa **Cloudflare Turnstile** para validar envios em `/api/contact`.
+
+O deploy usa um Worker em `src/worker.js` com binding de assets estáticos. Isso é necessário para o Cloudflare liberar **Variables and Secrets**; Workers criados apenas com static assets não aceitam variáveis pelo painel.
+
+Configure estas variáveis no Cloudflare Pages:
+
+```txt
+TURNSTILE_SITE_KEY=site key do widget
+TURNSTILE_SECRET_KEY=secret key usada no siteverify
+```
+
+A `TURNSTILE_SITE_KEY` é lida pelo front via `/api/turnstile-config`. A `TURNSTILE_SECRET_KEY` fica apenas na Function server-side e nunca deve ser exposta no HTML ou JavaScript público.
+
+Se o painel ainda não mostrar o formulário de variáveis depois do deploy, configure pela CLI:
+
+```sh
+npx wrangler secret put TURNSTILE_SECRET_KEY
+```
+
+A site key não é segredo. Ela pode ser cadastrada como variable `TURNSTILE_SITE_KEY` no painel depois do primeiro deploy com `main`, ou como `vars` no `wrangler.jsonc` para ambiente de teste.
+
 ## Licença e dados
 
 © 2025 Tem em Piranga — Todos os direitos reservados.  

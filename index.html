@@ -18,11 +18,12 @@
   <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self';
+    script-src 'self' https://challenges.cloudflare.com;
     style-src 'self' https://fonts.googleapis.com;
     font-src https://fonts.gstatic.com;
     img-src 'self' data:;
     connect-src 'self';
+    frame-src https://challenges.cloudflare.com;
     frame-ancestors 'none';
   " />
 
@@ -81,6 +82,42 @@
       <p>Nenhum resultado encontrado.<br>Tente outro termo ou categoria.</p>
     </div>
 
+    <!-- Formulário de contato -->
+    <section class="contato" id="contato" aria-labelledby="contato-titulo">
+      <div class="contato-copy">
+        <span class="contato-kicker">Fale com a gente</span>
+        <h2 id="contato-titulo">Quer anunciar ou sugerir um comércio?</h2>
+        <p>Envie uma mensagem pelo formulário. O Turnstile ajuda a proteger o site contra envios automáticos sem atrapalhar quem está só querendo conversar.</p>
+      </div>
+
+      <form class="contato-form" id="contato-form" action="/api/contact" method="post">
+        <div class="form-row">
+          <label for="contato-nome">Nome</label>
+          <input id="contato-nome" name="nome" type="text" autocomplete="name" required maxlength="120" />
+        </div>
+
+        <div class="form-row">
+          <label for="contato-email">E-mail</label>
+          <input id="contato-email" name="email" type="email" autocomplete="email" required maxlength="160" />
+        </div>
+
+        <div class="form-row">
+          <label for="contato-whatsapp">WhatsApp</label>
+          <input id="contato-whatsapp" name="whatsapp" type="tel" autocomplete="tel" maxlength="30" />
+        </div>
+
+        <div class="form-row">
+          <label for="contato-mensagem">Mensagem</label>
+          <textarea id="contato-mensagem" name="mensagem" rows="5" required maxlength="1200" placeholder="Conte rapidamente como podemos ajudar."></textarea>
+        </div>
+
+        <div id="turnstile-widget"></div>
+
+        <button class="btn-contato" type="submit">Enviar mensagem</button>
+        <p class="form-status" id="contato-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
     <!-- Banner anuncie -->
     <div class="banner-anuncie" aria-label="Anuncie seu negócio">
       <div class="banner-anuncie-txt">
@@ -107,5 +144,6 @@
   <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
 
   <script src="js/main.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit" async defer></script>
 </body>
 </html>
