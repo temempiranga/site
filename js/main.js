@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderCategorias();
   await carregarNegocios();
   bindBusca();
+  bindAnalytics();
 });
 
 /* ─── carrega dados ──────────────────────────────────── */
@@ -153,6 +154,26 @@ function bindBusca() {
   input.addEventListener('keydown', e => { if (e.key === 'Enter') executar(); });
   input.addEventListener('input', () => {
     if (input.value === '') { termoBusca = ''; renderCards(); }
+  });
+}
+
+/* ─── analytics ─────────────────────────────────────── */
+function bindAnalytics() {
+  const grid = document.getElementById('cards-grid');
+  if (!grid) return;
+
+  grid.addEventListener('click', e => {
+    const link = e.target.closest('.btn-wpp, .btn-ligar');
+    if (!link || typeof gtag !== 'function') return;
+
+    const card = link.closest('.card');
+    const nome = card ? card.querySelector('.card-nome')?.textContent : '';
+    const tipo = link.classList.contains('btn-wpp') ? 'whatsapp' : 'telefone';
+
+    gtag('event', 'clique_contato', {
+      tipo_contato: tipo,
+      nome_comercio: nome,
+    });
   });
 }
 
