@@ -17,7 +17,7 @@
   <title>Tem em Piranga | Guia de Comércios e Serviços de Piranga, MG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" />
   <link rel="preload" as="image" href="/img/icon-transparent.webp" type="image/webp" />
   <link rel="stylesheet" href="css/style.css" />
   <script defer src="js/main.js"></script>
@@ -79,7 +79,8 @@
     <p class="resultados-info" id="resultados-info" aria-live="polite"></p>
 
     <div class="cards-grid" id="cards-grid" aria-label="Lista de negócios">
-      <p style="color:#999;font-size:.9rem">Carregando...</p>
+      <div class="card skeleton" aria-hidden="true"></div>
+      <div class="card skeleton" aria-hidden="true"></div>
     </div>
 
     <div class="vazio" id="vazio" role="status">
@@ -113,5 +114,6 @@
     <p style="margin-top:6px;font-size:.7rem">© 2025 Tem em Piranga · Todos os direitos reservados</p>
   </footer>
 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" />
 </body>
 </html>

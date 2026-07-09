@@ -4,6 +4,7 @@
   --verde-dark:  #2a5025;
   --barro:       #D4622A;
   --barro-dark:  #b5511f;
+  --barro-darker: #8B3A12;
   --creme:       #F7F3EC;
   --carvao:      #2B2B2B;
   --cinza-leve:  #FAFAF8;
@@ -60,14 +61,14 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   color: var(--creme);
   letter-spacing: -0.4px;
 }
-.logo span { color: #F5A623; }
+.logo span { color: #FEF08A; }
 .header-sub {
   font-size: 0.7rem;
   color: rgba(247,243,236,0.92);
   margin-top: 1px;
 }
 .btn-anuncie-header {
-  background: var(--barro);
+  background: var(--barro-dark);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -78,7 +79,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   transition: background 0.15s;
   white-space: nowrap;
 }
-.btn-anuncie-header:hover { background: var(--barro-dark); }
+.btn-anuncie-header:hover { background: var(--barro-darker); }
 .header-nav {
   display: flex;
   align-items: center;
@@ -108,7 +109,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--barro);
+  color: var(--barro-dark);
   margin-bottom: 8px;
 }
 .hero-titulo {
@@ -120,7 +121,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   margin-bottom: 6px;
 }
 .hero-titulo em {
-  color: var(--barro);
+  color: var(--barro-dark);
   font-style: normal;
 }
 .hero-sub {
@@ -218,6 +219,20 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   box-shadow: 0 4px 18px rgba(0,0,0,0.08);
   transform: translateY(-2px);
 }
+.card.skeleton {
+  min-height: 220px;
+  border-color: transparent;
+  box-shadow: none;
+  background: linear-gradient(110deg, #f0ece4 30%, #e5e0d8 50%, #f0ece4 70%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s linear infinite;
+  pointer-events: none;
+}
+.card.skeleton:hover { transform: none; box-shadow: none; }
+@keyframes skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
 .card.destaque {
   border: 2px solid var(--barro);
 }
@@ -234,11 +249,11 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   letter-spacing: 0.5px;
   color: var(--verde);
 }
-.card.destaque .card-categoria { color: var(--barro); }
+.card.destaque .card-categoria { color: var(--barro-dark); }
 .badge-destaque {
   font-size: 0.65rem;
   background: #FFF0E8;
-  color: var(--barro);
+  color: var(--barro-darker);
   border-radius: 4px;
   padding: 2px 6px;
   font-weight: 600;
@@ -286,7 +301,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   align-items: center;
   justify-content: center;
   gap: 5px;
-  background: var(--wpp);
+  background: var(--verde);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -296,7 +311,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   text-decoration: none;
   transition: background 0.15s;
 }
-.btn-wpp:hover { background: var(--wpp-dark); }
+.btn-wpp:hover { background: var(--verde-dark); }
 .btn-ligar {
   display: flex;
   align-items: center;
@@ -348,7 +363,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   padding-left: 4px;
 }
 .contato-kicker {
-  color: var(--barro);
+  color: var(--barro-dark);
   display: block;
   font-family: var(--fonte-display);
   font-size: 0.76rem;
@@ -431,7 +446,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
 
 /* ─── banner anuncie ─────────────────────────────────── */
 .banner-anuncie {
-  background: var(--barro);
+  background: var(--barro-dark);
   border-radius: var(--radius-lg);
   padding: 20px 24px;
   display: flex;
@@ -448,10 +463,10 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   display: block;
   margin-bottom: 2px;
 }
-.banner-anuncie-txt p { font-size: 0.83rem; color: rgba(255,255,255,0.8); }
+.banner-anuncie-txt p { font-size: 0.83rem; color: rgba(255,255,255,0.95); }
 .btn-anuncie-banner {
   background: white;
-  color: var(--barro);
+  color: var(--barro-dark);
   border: none;
   border-radius: var(--radius-sm);
   padding: 10px 20px;
