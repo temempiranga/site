@@ -51,7 +51,8 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
 }
 .header-marca-icon {
   height: 38px;
-  width: auto;
+  width: 28px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 .logo {
