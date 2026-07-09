@@ -10,17 +10,81 @@
   <meta property="og:description" content="Tem em Piranga é o guia de comércios, serviços e profissionais de Piranga, MG. Encontre quem você precisa e fale direto pelo WhatsApp." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://temempiranga.com.br" />
-
-  <!-- OG image -->
   <meta property="og:image" content="https://temempiranga.com.br/img/social-square-white-1080.png" />
 
   <title>Tem em Piranga | Guia de Comércios e Serviços de Piranga, MG</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" />
+
+  <!-- Preload: fontes locais (não bloqueia render) -->
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/sora-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin.woff2" crossorigin />
+  <!-- Preload: CSS completo (baixa em paralelo, aplicado via JS após primeiro paint) -->
+  <link rel="preload" as="style" href="/css/style.css" />
+  <!-- Preload: ícone LCP -->
   <link rel="preload" as="image" href="/img/icon-transparent.webp" type="image/webp" />
-  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- CSS crítico inline (above-the-fold: fontes, reset, header, hero, skeleton) -->
+  <style>
+    /* fontes locais */
+    @font-face{font-family:'Inter';font-style:normal;font-weight:400 500;font-display:swap;src:url(/fonts/inter-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+    @font-face{font-family:'Inter';font-style:normal;font-weight:400 500;font-display:swap;src:url(/fonts/inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+    @font-face{font-family:'Sora';font-style:normal;font-weight:400 700;font-display:swap;src:url(/fonts/sora-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+    @font-face{font-family:'Sora';font-style:normal;font-weight:400 700;font-display:swap;src:url(/fonts/sora-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+    /* tokens */
+    :root{--verde:#3A6B35;--verde-dark:#2a5025;--barro:#D4622A;--barro-dark:#b5511f;--barro-darker:#8B3A12;--creme:#F7F3EC;--carvao:#2B2B2B;--cinza-leve:#FAFAF8;--cinza-borda:#E0DAD0;--fonte-display:'Sora',sans-serif;--fonte-corpo:'Inter',sans-serif;--radius-sm:6px;--radius-md:10px;--radius-lg:14px}
+    /* reset */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--fonte-corpo);background:var(--cinza-leve);color:var(--carvao);min-height:100vh}
+    img{display:block;max-width:100%}
+    a{color:inherit;text-decoration:none}
+    button{cursor:pointer;font-family:var(--fonte-corpo)}
+    /* header */
+    .header{background:var(--verde);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .header-marca{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .header-marca-icon{height:38px;width:28px;object-fit:contain;flex-shrink:0}
+    .logo{font-family:var(--fonte-display);font-size:1.25rem;font-weight:700;color:var(--creme);letter-spacing:-0.4px}
+    .logo span{color:#FEF08A}
+    .header-sub{font-size:.7rem;color:rgba(247,243,236,.92);margin-top:1px}
+    .btn-anuncie-header{background:var(--barro-dark);color:white;border:none;border-radius:var(--radius-sm);padding:7px 14px;font-size:.8rem;font-weight:600;font-family:var(--fonte-display);transition:background .15s;white-space:nowrap}
+    .btn-anuncie-header:hover{background:var(--barro-darker)}
+    .header-nav{display:flex;align-items:center;gap:16px}
+    .header-nav-link{font-family:var(--fonte-display);font-size:.82rem;font-weight:600;color:rgba(247,243,236,.92);text-decoration:none;white-space:nowrap;transition:color .15s}
+    .header-nav-link:hover{color:var(--creme)}
+    /* hero */
+    .hero{background:var(--creme);padding:32px 20px 24px;text-align:center;border-bottom:1px solid var(--cinza-borda)}
+    .hero-h1{font-family:var(--fonte-display);font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--barro-dark);margin-bottom:8px}
+    .hero-titulo{font-family:var(--fonte-display);font-size:clamp(1.5rem,5vw,2rem);font-weight:700;color:var(--carvao);line-height:1.2;margin-bottom:6px}
+    .hero-titulo em{color:var(--barro-dark);font-style:normal}
+    .hero-sub{font-size:.9rem;color:#666;margin-bottom:18px}
+    .busca-wrap{display:flex;max-width:480px;margin:0 auto;border:2px solid var(--verde);border-radius:var(--radius-md);overflow:hidden;background:white}
+    .busca-wrap input{flex:1;border:none;outline:none;padding:11px 14px;font-size:.95rem;font-family:var(--fonte-corpo);color:var(--carvao);background:transparent}
+    .busca-wrap input::placeholder{color:#aaa}
+    .busca-btn{background:var(--verde);color:white;border:none;padding:0 20px;font-size:.9rem;font-weight:600;font-family:var(--fonte-display);transition:background .15s}
+    .busca-btn:hover{background:var(--verde-dark)}
+    /* main + skeleton (above fold) */
+    .main{max-width:900px;margin:0 auto;padding:20px 16px 40px}
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .card.skeleton{min-height:220px;border-color:transparent;box-shadow:none;background:linear-gradient(110deg,#f0ece4 30%,#e5e0d8 50%,#f0ece4 70%);background-size:200% 100%;animation:skeleton-shimmer 1.5s linear infinite;pointer-events:none}
+    .card.skeleton:hover{transform:none;box-shadow:none}
+    @keyframes skeleton-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+    /* sr-only */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    /* responsivo crítico */
+    @media(max-width:480px){
+      .header{gap:10px}
+      .logo{font-size:1.1rem}
+      .btn-anuncie-header{display:none}
+      .hero{padding:24px 16px 20px}
+      .cards-grid{grid-template-columns:1fr}
+    }
+    /* acessibilidade */
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+    :focus-visible{outline:3px solid var(--barro);outline-offset:2px}
+  </style>
+
+  <!-- JS principal (defer): injeta style.css completo + inicializa app -->
   <script defer src="js/main.js"></script>
+
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-180.png" />
   <link rel="manifest" href="/manifest.json" />
@@ -114,6 +178,5 @@
     <p style="margin-top:6px;font-size:.7rem">© 2025 Tem em Piranga · Todos os direitos reservados</p>
   </footer>
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" />
 </body>
 </html>

@@ -1,9 +1,17 @@
 'use strict';
 
-/* ─── GA4: data layer + carregamento adiado após window.load ── */
+/* ─── CSS não-crítico: injeta após parse do HTML ──────── */
+(function () {
+  var l = document.createElement('link');
+  l.rel = 'stylesheet';
+  l.href = '/css/style.css';
+  document.head.appendChild(l);
+}());
+
+/* ─── GA4: carrega quando o browser estiver ocioso ───── */
 window.dataLayer = window.dataLayer || [];
 function gtag(){window.dataLayer.push(arguments);}
-window.addEventListener('load', function () {
+function _carregarGA4() {
   var s = document.createElement('script');
   s.async = true;
   s.src = 'https://www.googletagmanager.com/gtag/js?id=G-LLMHPW575C';
@@ -12,7 +20,12 @@ window.addEventListener('load', function () {
     gtag('js', new Date());
     gtag('config', 'G-LLMHPW575C');
   };
-});
+}
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(_carregarGA4, { timeout: 5000 });
+} else {
+  window.addEventListener('load', _carregarGA4);
+}
 
 /* ─── constantes ─────────────────────────────────────── */
 const CATEGORIAS = [
