@@ -43,6 +43,17 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   top: 0;
   z-index: 100;
 }
+.header-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.header-marca-icon {
+  height: 38px;
+  width: auto;
+  flex-shrink: 0;
+}
 .logo {
   font-family: var(--fonte-display);
   font-size: 1.25rem;
@@ -435,9 +446,16 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   background: var(--carvao);
   color: rgba(255,255,255,0.45);
   text-align: center;
-  padding: 20px;
+  padding: 28px 20px 20px;
   font-size: 0.78rem;
   line-height: 1.8;
+}
+.footer-logo {
+  height: 72px;
+  width: auto;
+  margin: 0 auto 14px;
+  display: block;
+  opacity: 0.92;
 }
 .footer a { color: #F5A623; }
 
