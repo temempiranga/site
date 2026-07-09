@@ -6,6 +6,9 @@
   <meta name="robots" content="noindex" />
 
   <title>Página não encontrada — Tem em Piranga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-180.png" />
@@ -68,7 +71,10 @@
 
   <header class="header">
     <a href="/" class="header-marca">
-      <img src="/img/icon-transparent.png" alt="" class="header-marca-icon" aria-hidden="true" width="28" height="38" />
+      <picture>
+        <source type="image/webp" srcset="/img/icon-transparent.webp" />
+        <img src="/img/icon-transparent.png" alt="" class="header-marca-icon" aria-hidden="true" width="28" height="38" fetchpriority="high" />
+      </picture>
       <div>
         <div class="logo">Tem em <span>Piranga</span></div>
         <div class="header-sub">Guia de comércios e serviços</div>
