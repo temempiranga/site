@@ -31,6 +31,23 @@
   src: url(/fonts/sora-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/* Fallbacks com métricas ajustadas — elimina reflow/CLS na troca de fonte */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 107.06%;
+  ascent-override: 90.49%;
+  descent-override: 22.56%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Sora Fallback';
+  src: local('Arial');
+  size-adjust: 117.95%;
+  ascent-override: 82.24%;
+  descent-override: 24.59%;
+  line-gap-override: 0%;
+}
 
 /* ─── tokens ─────────────────────────────────────────── */
 :root {
@@ -45,8 +62,8 @@
   --cinza-borda: #E0DAD0;
   --wpp:         #25D366;
   --wpp-dark:    #1da851;
-  --fonte-display: 'Sora', sans-serif;
-  --fonte-corpo:   'Inter', sans-serif;
+  --fonte-display: 'Sora', 'Sora Fallback', sans-serif;
+  --fonte-corpo:   'Inter', 'Inter Fallback', sans-serif;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -215,7 +232,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   color: #555;
   font-size: 0.82rem;
   font-weight: 500;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .cat-btn:hover,
 .cat-btn.ativo {
@@ -247,10 +264,10 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   padding: 16px;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition: filter 0.15s, transform 0.15s;
 }
 .card:hover {
-  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  filter: drop-shadow(0 4px 18px rgba(0,0,0,0.08));
   transform: translateY(-2px);
 }
 .card.skeleton {
@@ -262,7 +279,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   animation: skeleton-shimmer 1.5s linear infinite;
   pointer-events: none;
 }
-.card.skeleton:hover { transform: none; box-shadow: none; }
+.card.skeleton:hover { transform: none; filter: none; }
 @keyframes skeleton-shimmer {
   from { background-position: 200% 0; }
   to   { background-position: -200% 0; }
@@ -358,7 +375,7 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 .btn-ligar:hover { background: var(--verde); color: white; }
 
