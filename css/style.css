@@ -517,14 +517,29 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   font-size: 0.78rem;
   line-height: 1.8;
 }
-.footer-logo {
-  height: 72px;
-  width: auto;
-  margin: 0 auto 14px;
+.footer picture {
   display: block;
+  margin: 0 auto 14px;
+  width: fit-content;
+}
+.footer-logo {
+  display: block;
+  height: 72px;
+  width: 72px;
   opacity: 0.92;
 }
 .footer a { color: #F5A623; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ─── responsivo ─────────────────────────────────────── */
 @media (max-width: 480px) {

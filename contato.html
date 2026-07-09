@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" />
   <link rel="stylesheet" href="/css/style.css" />
+  <script defer src="/js/contato.js"></script>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-180.png" />
   <link rel="manifest" href="/manifest.json" />
@@ -86,101 +87,5 @@
     <p style="margin-top:6px;font-size:.7rem">© 2025 Tem em Piranga · Todos os direitos reservados</p>
   </footer>
 
-  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
-
-  <script>
-  'use strict';
-
-  let turnstileSiteKey = '';
-  let turnstileWidgetId = null;
-
-  window.onTurnstileLoad = renderTurnstileWidget;
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    bindContato();
-    await carregarTurnstileConfig();
-    renderTurnstileWidget();
-  });
-
-  function bindContato() {
-    const form = document.getElementById('contato-form');
-    const status = document.getElementById('contato-status');
-    if (!form || !status) return;
-
-    form.addEventListener('submit', async event => {
-      event.preventDefault();
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const formData = new FormData(form);
-
-      status.textContent = '';
-      status.className = 'form-status';
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Enviando...';
-
-      try {
-        const resp = await fetch(form.action, {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await resp.json().catch(() => ({}));
-
-        if (!resp.ok) {
-          throw new Error(data.message || 'Não foi possível enviar sua mensagem.');
-        }
-
-        form.reset();
-        if (window.turnstile) window.turnstile.reset();
-        status.textContent = data.message || 'Mensagem enviada com sucesso.';
-        status.classList.add('sucesso');
-      } catch (err) {
-        status.textContent = err.message;
-        status.classList.add('erro');
-        if (window.turnstile) window.turnstile.reset();
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Enviar mensagem';
-      }
-    });
-  }
-
-  async function carregarTurnstileConfig() {
-    const widget = document.getElementById('turnstile-widget');
-    if (!widget) return;
-
-    try {
-      const resp = await fetch('/api/turnstile-config');
-      const data = await resp.json();
-      if (!resp.ok || !data.siteKey) {
-        throw new Error(data.message || 'Turnstile não configurado.');
-      }
-      turnstileSiteKey = data.siteKey;
-    } catch (err) {
-      widget.innerHTML = '<p class="form-status erro">' + escapeHtml(err.message) + '</p>';
-    }
-  }
-
-  function renderTurnstileWidget() {
-    const widget = document.getElementById('turnstile-widget');
-    if (!widget || !turnstileSiteKey || !window.turnstile || turnstileWidgetId !== null) return;
-
-    turnstileWidgetId = window.turnstile.render(widget, {
-      sitekey: turnstileSiteKey,
-      theme: 'light',
-    });
-  }
-
-  function escapeHtml(str) {
-    if (typeof str !== 'string') return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-  </script>
-
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit" async defer></script>
 </body>
 </html>

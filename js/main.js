@@ -1,5 +1,19 @@
 'use strict';
 
+/* ─── GA4: data layer + carregamento adiado após window.load ── */
+window.dataLayer = window.dataLayer || [];
+function gtag(){window.dataLayer.push(arguments);}
+window.addEventListener('load', function () {
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=G-LLMHPW575C';
+  document.head.appendChild(s);
+  s.onload = function () {
+    gtag('js', new Date());
+    gtag('config', 'G-LLMHPW575C');
+  };
+});
+
 /* ─── constantes ─────────────────────────────────────── */
 const CATEGORIAS = [
   'Todos', 'Alimentação', 'Beleza', 'Mecânica',
@@ -56,7 +70,8 @@ function filtrados() {
         n.nome.toLowerCase().includes(t) ||
         n.descricao.toLowerCase().includes(t) ||
         n.categoria.toLowerCase().includes(t) ||
-        n.bairro.toLowerCase().includes(t)
+        n.bairro.toLowerCase().includes(t) ||
+        (n.endereco || '').toLowerCase().includes(t)
       );
     })
     .sort((a, b) => b.destaque - a.destaque);
@@ -122,7 +137,7 @@ function cardHTML(n) {
     <p class="card-desc">${escapeHtml(n.descricao)}</p>
     <div class="card-meta">
       <span>🕐 ${escapeHtml(n.horario)}</span>
-      <span>📍 ${escapeHtml(n.bairro)}</span>
+      <span>📍 ${escapeHtml(n.endereco ? n.endereco + ', ' + n.bairro : n.bairro)}</span>
       ${rural}
     </div>
     <div class="card-acoes">
