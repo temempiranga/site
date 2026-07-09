@@ -89,6 +89,15 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   text-align: center;
   border-bottom: 1px solid var(--cinza-borda);
 }
+.hero-h1 {
+  font-family: var(--fonte-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--barro);
+  margin-bottom: 8px;
+}
 .hero-titulo {
   font-family: var(--fonte-display);
   font-size: clamp(1.5rem, 5vw, 2rem);
@@ -441,6 +450,29 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   text-decoration: none;
 }
 .btn-anuncie-banner:hover { opacity: 0.9; }
+
+/* ─── sobre ──────────────────────────────────────────── */
+.sobre-nos {
+  background: white;
+  border-top: 1px solid var(--cinza-borda);
+  padding: 44px 20px;
+  text-align: center;
+}
+.sobre-nos h2 {
+  font-family: var(--fonte-display);
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  font-weight: 700;
+  color: var(--carvao);
+  margin-bottom: 14px;
+}
+.sobre-nos p {
+  font-size: 0.94rem;
+  color: #4a4a4a;
+  line-height: 1.65;
+  max-width: 640px;
+  margin: 0 auto 10px;
+}
+.sobre-nos p:last-child { margin-bottom: 0; }
 
 /* ─── footer ─────────────────────────────────────────── */
 .footer {
