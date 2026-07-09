@@ -81,6 +81,21 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   white-space: nowrap;
 }
 .btn-anuncie-header:hover { background: var(--barro-dark); }
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-nav-link {
+  font-family: var(--fonte-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(247,243,236,0.8);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.header-nav-link:hover { color: var(--creme); }
 
 /* ─── hero ───────────────────────────────────────────── */
 .hero {
@@ -473,6 +488,27 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   margin: 0 auto 10px;
 }
 .sobre-nos p:last-child { margin-bottom: 0; }
+
+.sobre-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 20px 60px;
+  text-align: center;
+}
+.sobre-page h1 {
+  font-family: var(--fonte-display);
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  font-weight: 700;
+  color: var(--carvao);
+  margin-bottom: 20px;
+}
+.sobre-page p {
+  font-size: 0.94rem;
+  color: #4a4a4a;
+  line-height: 1.65;
+  margin-bottom: 12px;
+}
+.sobre-page p:last-child { margin-bottom: 0; }
 
 /* ─── footer ─────────────────────────────────────────── */
 .footer {
