@@ -15,7 +15,7 @@ jobs:
 
       - name: Verificar estrutura de arquivos obrigatórios
         run: |
-          files=("index.html" "contato.html" "404.html" "css/style.css" "js/main.js" "data/comercios.json" "_headers" "_redirects" "src/worker.js")
+          files=("index.html" "contato.html" "sobre.html" "404.html" "css/style.css" "js/main.js" "data/comercios.json" "_headers" "_redirects" "src/worker.js")
           for f in "${files[@]}"; do
             if [ ! -f "$f" ]; then
               echo "❌ Arquivo obrigatório não encontrado: $f"
@@ -42,7 +42,7 @@ jobs:
       - name: Validar HTML (tags abertas/fechadas)
         run: |
           erro=0
-          for f in index.html contato.html 404.html; do
+          for f in index.html contato.html sobre.html 404.html; do
             if ! python3 -c "
           import html.parser, sys
           class V(html.parser.HTMLParser):
