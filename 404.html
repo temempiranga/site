@@ -101,18 +101,7 @@
     <p style="margin-top:6px;font-size:.7rem">&copy; 2025 Tem em Piranga · Todos os direitos reservados</p>
   </footer>
 
-  <script>
-    (function () {
-      var match = document.cookie.match(/(__cf_ray|cf-ray)=([^;]+)/);
-      if (!match) {
-        var meta = document.querySelector('meta[name="cf-ray"]');
-        if (meta) match = [null, null, meta.content];
-      }
-      if (match && match[2]) {
-        document.getElementById('rayid').textContent = 'Ray ID: ' + match[2];
-      }
-    })();
-  </script>
+  <script defer src="/js/rayid.js"></script>
 
 </body>
 </html>
