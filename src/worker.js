@@ -1,5 +1,17 @@
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
+const SECURITY_HEADERS = {
+  'Strict-Transport-Security': 'max-age=86400; includeSubDomains',
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+  'Content-Security-Policy':
+    "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
+};
+
+const COMERCIO_PATH_RE = /^\/comercio\/([^/]+)\/?$/;
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -12,9 +24,264 @@ export default {
       return handleContact(request, env);
     }
 
+    if (request.method === 'GET' || request.method === 'HEAD') {
+      if (url.pathname === '/sitemap.xml') {
+        return handleSitemap(request, env, url);
+      }
+
+      const comercioMatch = url.pathname.match(COMERCIO_PATH_RE);
+      if (comercioMatch) {
+        return handleComercioPage(request, env, url, comercioMatch[1]);
+      }
+    }
+
     return env.ASSETS.fetch(request);
   },
 };
+
+/* ─── páginas individuais de comércio ─────────────────── */
+async function handleComercioPage(request, env, url, rawId) {
+  let id;
+  try {
+    id = decodeURIComponent(rawId);
+  } catch (err) {
+    id = rawId;
+  }
+
+  const comercios = await loadComercios(request, env);
+  const item = comercios.find(c => c.id === id && c.ativo === true);
+
+  if (!item) {
+    return notFoundResponse(request, env);
+  }
+
+  const html = renderComercioPage(item, url.origin);
+  return htmlResponse(html, 200, request.method);
+}
+
+async function loadComercios(request, env) {
+  const dataUrl = new URL('/data/comercios.json', request.url);
+  const resp = await env.ASSETS.fetch(new Request(dataUrl, { method: 'GET' }));
+  if (!resp.ok) return [];
+  try {
+    return await resp.json();
+  } catch (err) {
+    return [];
+  }
+}
+
+async function notFoundResponse(request, env) {
+  const assetUrl = new URL('/404.html', request.url);
+  const assetResp = await env.ASSETS.fetch(new Request(assetUrl, { method: 'GET' }));
+  const headers = new Headers(assetResp.headers);
+  applySecurityHeaders(headers);
+  const body = request.method === 'HEAD' ? null : assetResp.body;
+  return new Response(body, { status: 404, headers });
+}
+
+function renderComercioPage(item, origin) {
+  const pageUrl = `${origin}/comercio/${encodeURIComponent(item.id)}`;
+  const title = `${item.nome} — ${item.categoria} em Piranga, MG | Tem em Piranga`;
+  const description = `${item.nome}: ${item.descricao} Endereço, horário e contato pelo WhatsApp. ${item.categoria} em Piranga, MG.`;
+  const ogImage = `${origin}/img/social-square-white-1080.png`;
+
+  const wppLink = `https://wa.me/${item.whatsapp}?text=${encodeURIComponent(
+    `Olá! Vi o ${item.nome} no Tem em Piranga e quero saber mais.`
+  )}`;
+  const telLink = `tel:+55${item.telefone}`;
+  const rural = item.entrega_rural
+    ? '<span class="badge-rural">🌾 Entrega zona rural</span>'
+    : '';
+  const enderecoCompleto = item.endereco ? `${item.endereco}, ${item.bairro}` : item.bairro;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: item.nome,
+    description: item.descricao,
+    telephone: `+55${item.telefone}`,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: item.endereco || item.bairro,
+      addressLocality: 'Piranga',
+      addressRegion: 'MG',
+      addressCountry: 'BR',
+    },
+    url: pageUrl,
+  };
+  const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="${escapeHtml(description)}" />
+
+  <meta property="og:title" content="${escapeHtml(title)}" />
+  <meta property="og:description" content="${escapeHtml(description)}" />
+  <meta property="og:type" content="business.business" />
+  <meta property="og:url" content="${escapeHtml(pageUrl)}" />
+  <meta property="og:image" content="${escapeHtml(ogImage)}" />
+
+  <title>${escapeHtml(title)}</title>
+  <link rel="canonical" href="${escapeHtml(pageUrl)}" />
+
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/sora-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin.woff2" crossorigin />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-180.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#3A6B35" />
+
+  <script type="application/ld+json">${jsonLdScript}</script>
+</head>
+<body>
+
+  <header class="header">
+    <a href="/" class="header-marca">
+      <picture>
+        <source type="image/webp" srcset="/img/icon-transparent.webp" />
+        <img src="/img/icon-transparent.png" alt="" class="header-marca-icon" aria-hidden="true" width="28" height="38" fetchpriority="high" />
+      </picture>
+      <div>
+        <div class="logo">Tem em <span>Piranga</span></div>
+        <div class="header-sub">Guia de comércios e serviços</div>
+      </div>
+    </a>
+    <nav class="header-nav">
+      <a href="/sobre" class="header-nav-link">Sobre</a>
+      <a
+        class="btn-anuncie-header"
+        href="https://wa.me/5531999999000?text=Olá!%20Quero%20anunciar%20meu%20negócio%20no%20Tem%20em%20Piranga."
+        target="_blank"
+        rel="noopener noreferrer"
+      >Anuncie aqui</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <p style="margin-bottom:16px">
+      <a href="/" style="color:var(--verde);font-weight:600;font-size:0.85rem">← Voltar para o guia</a>
+    </p>
+
+    <article class="card${item.destaque ? ' destaque' : ''}" aria-label="${escapeHtml(item.nome)}">
+      <div class="card-topo">
+        <span class="card-categoria">${escapeHtml(item.categoria)}</span>
+        ${item.destaque ? '<span class="badge-destaque">⭐ Destaque</span>' : ''}
+      </div>
+      <h1 class="card-nome">${escapeHtml(item.nome)}</h1>
+      <p class="card-desc">${escapeHtml(item.descricao)}</p>
+      <div class="card-meta">
+        <span>🕐 ${escapeHtml(item.horario)}</span>
+        <span>📍 ${escapeHtml(enderecoCompleto)}</span>
+        ${rural}
+      </div>
+      <div class="card-acoes">
+        <a class="btn-wpp" href="${wppLink}" target="_blank" rel="noopener noreferrer"
+           aria-label="Abrir WhatsApp de ${escapeHtml(item.nome)}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          WhatsApp
+        </a>
+        <a class="btn-ligar" href="${telLink}" aria-label="Ligar para ${escapeHtml(item.nome)}">
+          📞 Ligar
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <picture>
+      <source type="image/webp" srcset="/img/logo-tem-em-piranga.webp" />
+      <img src="/img/logo-tem-em-piranga.png" alt="Tem em Piranga" class="footer-logo" width="72" height="72" loading="lazy" />
+    </picture>
+    <p>temempiranga.com.br · Piranga, Minas Gerais</p>
+    <p><a href="/sobre">Sobre</a> · <a href="/contato">Contato</a> · <a href="/politica-de-privacidade">Privacidade</a> · <a href="/termos-de-uso">Termos</a></p>
+    <p style="margin-top:6px;font-size:.7rem">© 2025 Tem em Piranga · Todos os direitos reservados</p>
+  </footer>
+
+</body>
+</html>
+`;
+}
+
+/* ─── sitemap.xml dinâmico ─────────────────────────────── */
+async function handleSitemap(request, env, url) {
+  const comercios = await loadComercios(request, env);
+  const origin = url.origin;
+
+  const staticUrls = [
+    { loc: '/', changefreq: 'weekly', priority: '1.0' },
+    { loc: '/sobre', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/contato', changefreq: 'monthly', priority: '0.6' },
+    { loc: '/politica-de-privacidade', changefreq: 'yearly', priority: '0.3' },
+    { loc: '/termos-de-uso', changefreq: 'yearly', priority: '0.3' },
+  ];
+
+  const comercioUrls = comercios
+    .filter(c => c.ativo === true)
+    .map(c => ({
+      loc: `/comercio/${encodeURIComponent(c.id)}`,
+      changefreq: 'monthly',
+      priority: '0.5',
+    }));
+
+  const allUrls = [...staticUrls, ...comercioUrls];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allUrls
+  .map(
+    u => `  <url>
+    <loc>${escapeXml(origin + u.loc)}</loc>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`
+  )
+  .join('\n')}
+</urlset>
+`;
+
+  const headers = new Headers({
+    'Content-Type': 'application/xml; charset=utf-8',
+  });
+  applySecurityHeaders(headers);
+  const body = request.method === 'HEAD' ? null : xml;
+  return new Response(body, { status: 200, headers });
+}
+
+/* ─── helpers de resposta ──────────────────────────────── */
+function htmlResponse(html, status, method) {
+  const headers = new Headers({
+    'Content-Type': 'text/html; charset=utf-8',
+  });
+  applySecurityHeaders(headers);
+  const body = method === 'HEAD' ? null : html;
+  return new Response(body, { status, headers });
+}
+
+function applySecurityHeaders(headers) {
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    headers.set(key, value);
+  }
+}
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function escapeXml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 function handleTurnstileConfig(request, env) {
   if (request.method !== 'GET') {

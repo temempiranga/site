@@ -146,7 +146,7 @@ function cardHTML(n) {
       <span class="card-categoria">${escapeHtml(n.categoria)}</span>
       ${n.destaque ? '<span class="badge-destaque">⭐ Destaque</span>' : ''}
     </div>
-    <h2 class="card-nome">${escapeHtml(n.nome)}</h2>
+    <h2 class="card-nome"><a href="/comercio/${encodeURIComponent(n.id)}">${escapeHtml(n.nome)}</a></h2>
     <p class="card-desc">${escapeHtml(n.descricao)}</p>
     <div class="card-meta">
       <span>🕐 ${escapeHtml(n.horario)}</span>
