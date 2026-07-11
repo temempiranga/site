@@ -30,3 +30,7 @@ build/
 # Temporários
 *.tmp
 *.bak
+
+# Cloudflare Workers / Claude Code (local)
+.wrangler/
+.claude/
