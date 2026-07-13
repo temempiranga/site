@@ -1,12 +1,22 @@
 'use strict';
 
 /* ─── CSS não-crítico: injeta após parse do HTML ──────── */
-(function () {
+/* cssReady resolve quando o style.css completo (.card, .btn-wpp etc.)
+   termina de aplicar — ou depois de 2s, o que vier primeiro. Isso evita
+   que os cards reais substituam o skeleton antes do CSS estar pronto
+   (o que deixava os cards "pelados" em conexões mais lentas). */
+var cssReady = new Promise(function (resolve) {
   var l = document.createElement('link');
   l.rel = 'stylesheet';
   l.href = '/css/style.css';
+  l.onload = resolve;
+  l.onerror = function () {
+    console.error('Falha ao carregar /css/style.css');
+    resolve(); // não trava a página pra sempre se o CSS falhar
+  };
   document.head.appendChild(l);
-}());
+  setTimeout(resolve, 2000); // failsafe de rede muito lenta/instável
+});
 
 /* ─── GA4: carrega quando o browser estiver ocioso ───── */
 window.dataLayer = window.dataLayer || [];
@@ -63,6 +73,7 @@ async function carregarNegocios() {
     const resp = await fetch('data/comercios.json');
     if (!resp.ok) throw new Error('Falha ao carregar dados');
     todosOsNegocios = await resp.json();
+    await cssReady; // garante que .card/.btn-wpp já estão estilizados antes de sair do skeleton
     renderCards();
   } catch (err) {
     console.error(err);
