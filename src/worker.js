@@ -213,20 +213,24 @@ async function handleSitemap(request, env, url) {
   const comercios = await loadComercios(request, env);
   const origin = url.origin;
 
+  // Google documenta que ignora changefreq/priority — o sinal que ele
+  // realmente usa é lastmod. Atualize SITE_LASTMOD quando editar o
+  // conteúdo das páginas estáticas (home, sobre, contato, etc.).
+  const SITE_LASTMOD = '2026-07-14';
+
   const staticUrls = [
-    { loc: '/', changefreq: 'weekly', priority: '1.0' },
-    { loc: '/sobre', changefreq: 'monthly', priority: '0.7' },
-    { loc: '/contato', changefreq: 'monthly', priority: '0.6' },
-    { loc: '/politica-de-privacidade', changefreq: 'yearly', priority: '0.3' },
-    { loc: '/termos-de-uso', changefreq: 'yearly', priority: '0.3' },
+    { loc: '/', lastmod: SITE_LASTMOD },
+    { loc: '/sobre', lastmod: SITE_LASTMOD },
+    { loc: '/contato', lastmod: SITE_LASTMOD },
+    { loc: '/politica-de-privacidade', lastmod: SITE_LASTMOD },
+    { loc: '/termos-de-uso', lastmod: SITE_LASTMOD },
   ];
 
   const comercioUrls = comercios
     .filter(c => c.ativo === true)
     .map(c => ({
       loc: `/comercio/${encodeURIComponent(c.id)}`,
-      changefreq: 'monthly',
-      priority: '0.5',
+      lastmod: c.atualizado_em || SITE_LASTMOD,
     }));
 
   const allUrls = [...staticUrls, ...comercioUrls];
@@ -237,8 +241,7 @@ ${allUrls
   .map(
     u => `  <url>
     <loc>${escapeXml(origin + u.loc)}</loc>
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
+    <lastmod>${u.lastmod}</lastmod>
   </url>`
   )
   .join('\n')}
