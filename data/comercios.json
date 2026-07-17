@@ -12,7 +12,8 @@
     "bairro": "Centro",
     "entrega_rural": false,
     "destaque": false,
-    "ativo": true
+    "ativo": true,
+    "atualizado_em": "2026-07-14"
   },
   {
     "id": "forninho-pizzas",
@@ -27,6 +28,7 @@
     "bairro": "Centro",
     "entrega_rural": false,
     "destaque": false,
-    "ativo": true
+    "ativo": true,
+    "atualizado_em": "2026-07-14"
   }
 ]
