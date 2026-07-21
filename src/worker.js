@@ -1,14 +1,6 @@
-import { WorkerMailer } from 'worker-mailer';
-
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const CONTACT_EMAIL = 'contato@temempiranga.com.br';
-// smtp.hostinger.com resolve para um IP da própria Cloudflare (a Hostinger
-// proxia o e-mail Business via Cloudflare), e o Workers bloqueia conexões
-// TCP de saída para IPs da rede Cloudflare. smtp.titan.email é o host real
-// da Titan (infraestrutura por trás do e-mail Business da Hostinger),
-// fora da rede da Cloudflare — mesma conta/senha, host diferente.
-const CONTACT_SMTP_HOST = 'smtp.titan.email';
-const CONTACT_SMTP_PORT = 465;
+const RESEND_API_URL = 'https://api.resend.com/emails';
 
 const SECURITY_HEADERS = {
   'Strict-Transport-Security': 'max-age=86400; includeSubDomains',
@@ -387,7 +379,7 @@ async function handleContact(request, env) {
     return jsonResponse({ message: 'Preencha nome, e-mail e mensagem.' }, 400);
   }
 
-  if (!env.CONTACT_SMTP_PASSWORD) {
+  if (!env.RESEND_API_KEY) {
     return jsonResponse({ message: 'Envio de e-mail não configurado no servidor.' }, 500);
   }
 
@@ -416,25 +408,25 @@ async function sendContactEmail(env, contato) {
     contato.mensagem,
   ].join('\n');
 
-  await WorkerMailer.send(
-    {
-      host: CONTACT_SMTP_HOST,
-      port: CONTACT_SMTP_PORT,
-      secure: true,
-      credentials: {
-        username: CONTACT_EMAIL,
-        password: env.CONTACT_SMTP_PASSWORD,
-      },
-      authType: ['login', 'plain'],
+  const resp = await fetch(RESEND_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
     },
-    {
-      from: { name: 'Tem em Piranga — Site', email: CONTACT_EMAIL },
-      to: { email: CONTACT_EMAIL },
-      reply: { name: contato.nome, email: contato.email },
+    body: JSON.stringify({
+      from: `Tem em Piranga — Site <${CONTACT_EMAIL}>`,
+      to: [CONTACT_EMAIL],
+      reply_to: `${contato.nome} <${contato.email}>`,
       subject: `Novo contato pelo site: ${contato.nome}`,
       text: texto,
-    }
-  );
+    }),
+  });
+
+  if (!resp.ok) {
+    const body = await resp.text().catch(() => '');
+    throw new Error(`Resend respondeu ${resp.status}: ${body}`);
+  }
 }
 
 async function verifyTurnstile({ secret, token, ip }) {

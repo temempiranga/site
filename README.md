@@ -67,12 +67,12 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 
 Secrets (`wrangler secret put`) não sofrem esse problema de sincronização — persistem entre deploys independente do `wrangler.jsonc`.
 
-Depois de validado pelo Turnstile, o envio é feito por e-mail via SMTP (`smtp.titan.email:465` — infraestrutura Titan por trás do e-mail Business da Hostinger; mesma conta/senha, mas **não** use `smtp.hostinger.com`, que resolve para um IP da própria Cloudflare e é bloqueado pelas restrições de rede do Workers), usando a lib [`worker-mailer`](https://github.com/zou-yu/worker-mailer) (TCP Sockets do Workers — exige `compatibility_flags: ["nodejs_compat"]` no `wrangler.jsonc`, já configurado). O Worker autentica e envia como `contato@temempiranga.com.br`, com `Reply-To` para o e-mail informado no formulário.
+Depois de validado pelo Turnstile, o envio é feito via [Resend](https://resend.com) (API HTTP, chamada com `fetch` — sem dependências). Tentamos primeiro enviar por SMTP direto da Hostinger (`smtp.hostinger.com`), mas esse host resolve para um IP da própria Cloudflare, e o Workers bloqueia conexões TCP de saída para IPs da rede Cloudflare; a Hostinger confirmou que não existe um host alternativo fora dessa rota, então a saída é um envio HTTP. O Worker envia como `contato@temempiranga.com.br`, com `Reply-To` para o e-mail informado no formulário — requer o domínio `temempiranga.com.br` verificado no Resend (registros SPF/DKIM adicionados no DNS da Cloudflare).
 
-Configure a senha da caixa como secret:
+Configure a API key como secret:
 
 ```sh
-npx wrangler secret put CONTACT_SMTP_PASSWORD
+npx wrangler secret put RESEND_API_KEY
 ```
 
 Sem essa variável configurada, `/api/contact` responde `500` e não tenta enviar.

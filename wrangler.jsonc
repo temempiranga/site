@@ -2,12 +2,11 @@
   "name": "site",
   "main": "src/worker.js",
   "compatibility_date": "2026-06-23",
-  "compatibility_flags": ["nodejs_compat"],
   // TURNSTILE_SITE_KEY não é segredo (fica embutida no HTML do widget do
   // cliente) — precisa estar aqui, e não só cadastrada no painel, porque
   // "vars" é sincronizado de forma declarativa a cada deploy: qualquer
   // variable configurada só pelo painel é apagada no próximo `wrangler
-  // deploy`. Secrets (TURNSTILE_SECRET_KEY, CONTACT_SMTP_PASSWORD) não têm
+  // deploy`. Secrets (TURNSTILE_SECRET_KEY, RESEND_API_KEY) não têm
   // esse problema — continuam via `wrangler secret put`.
   "vars": {
     "TURNSTILE_SITE_KEY": "0x4AAAAAADpzJiWyG2aNAKjg"
