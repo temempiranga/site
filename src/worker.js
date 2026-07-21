@@ -2,7 +2,12 @@ import { WorkerMailer } from 'worker-mailer';
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const CONTACT_EMAIL = 'contato@temempiranga.com.br';
-const CONTACT_SMTP_HOST = 'smtp.hostinger.com';
+// smtp.hostinger.com resolve para um IP da própria Cloudflare (a Hostinger
+// proxia o e-mail Business via Cloudflare), e o Workers bloqueia conexões
+// TCP de saída para IPs da rede Cloudflare. smtp.titan.email é o host real
+// da Titan (infraestrutura por trás do e-mail Business da Hostinger),
+// fora da rede da Cloudflare — mesma conta/senha, host diferente.
+const CONTACT_SMTP_HOST = 'smtp.titan.email';
 const CONTACT_SMTP_PORT = 465;
 
 const SECURITY_HEADERS = {
