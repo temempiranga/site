@@ -1,0 +1,7 @@
+{
+  "name": "tem-em-piranga-site",
+  "private": true,
+  "dependencies": {
+    "worker-mailer": "^1.2.1"
+  }
+}

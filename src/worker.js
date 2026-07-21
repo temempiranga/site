@@ -1,4 +1,9 @@
+import { WorkerMailer } from 'worker-mailer';
+
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const CONTACT_EMAIL = 'contato@temempiranga.com.br';
+const CONTACT_SMTP_HOST = 'smtp.hostinger.com';
+const CONTACT_SMTP_PORT = 465;
 
 const SECURITY_HEADERS = {
   'Strict-Transport-Security': 'max-age=86400; includeSubDomains',
@@ -377,17 +382,54 @@ async function handleContact(request, env) {
     return jsonResponse({ message: 'Preencha nome, e-mail e mensagem.' }, 400);
   }
 
-  console.log('Contato validado pelo Turnstile', {
-    nome: contato.nome,
-    email: contato.email,
-    whatsapp: contato.whatsapp,
-    mensagem: contato.mensagem,
-    turnstileHostname: verification.hostname,
-  });
+  if (!env.CONTACT_SMTP_PASSWORD) {
+    return jsonResponse({ message: 'Envio de e-mail não configurado no servidor.' }, 500);
+  }
+
+  try {
+    await sendContactEmail(env, contato);
+  } catch (err) {
+    console.error('Falha ao enviar e-mail de contato', err);
+    return jsonResponse(
+      { message: 'Não foi possível enviar sua mensagem agora. Tente novamente em instantes.' },
+      502
+    );
+  }
 
   return jsonResponse({
-    message: 'Mensagem validada pelo Turnstile e recebida com sucesso.',
+    message: 'Mensagem enviada com sucesso.',
   });
+}
+
+async function sendContactEmail(env, contato) {
+  const texto = [
+    `Nome: ${contato.nome}`,
+    `E-mail: ${contato.email}`,
+    `WhatsApp: ${contato.whatsapp || '(não informado)'}`,
+    '',
+    'Mensagem:',
+    contato.mensagem,
+  ].join('\n');
+
+  await WorkerMailer.send(
+    {
+      host: CONTACT_SMTP_HOST,
+      port: CONTACT_SMTP_PORT,
+      secure: true,
+      credentials: {
+        username: CONTACT_EMAIL,
+        password: env.CONTACT_SMTP_PASSWORD,
+      },
+      authType: 'plain',
+    },
+    {
+      from: { name: 'Tem em Piranga — Site', email: CONTACT_EMAIL },
+      to: { email: CONTACT_EMAIL },
+      reply: { name: contato.nome, email: contato.email },
+      subject: `Novo contato pelo site: ${contato.nome}`,
+      text: texto,
+    }
+  );
 }
 
 async function verifyTurnstile({ secret, token, ip }) {
