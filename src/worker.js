@@ -425,7 +425,7 @@ async function sendContactEmail(env, contato) {
         username: CONTACT_EMAIL,
         password: env.CONTACT_SMTP_PASSWORD,
       },
-      authType: 'plain',
+      authType: ['login', 'plain'],
     },
     {
       from: { name: 'Tem em Piranga — Site', email: CONTACT_EMAIL },
