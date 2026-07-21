@@ -67,7 +67,7 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 
 Secrets (`wrangler secret put`) não sofrem esse problema de sincronização — persistem entre deploys independente do `wrangler.jsonc`.
 
-Depois de validado pelo Turnstile, o envio é feito por e-mail via SMTP da Hostinger (`smtp.hostinger.com:465`), usando a lib [`worker-mailer`](https://github.com/zou-yu/worker-mailer) (TCP Sockets do Workers — exige `compatibility_flags: ["nodejs_compat"]` no `wrangler.jsonc`, já configurado). O Worker autentica e envia como `contato@temempiranga.com.br`, com `Reply-To` para o e-mail informado no formulário.
+Depois de validado pelo Turnstile, o envio é feito por e-mail via SMTP (`smtp.titan.email:465` — infraestrutura Titan por trás do e-mail Business da Hostinger; mesma conta/senha, mas **não** use `smtp.hostinger.com`, que resolve para um IP da própria Cloudflare e é bloqueado pelas restrições de rede do Workers), usando a lib [`worker-mailer`](https://github.com/zou-yu/worker-mailer) (TCP Sockets do Workers — exige `compatibility_flags: ["nodejs_compat"]` no `wrangler.jsonc`, já configurado). O Worker autentica e envia como `contato@temempiranga.com.br`, com `Reply-To` para o e-mail informado no formulário.
 
 Configure a senha da caixa como secret:
 
