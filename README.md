@@ -57,22 +57,15 @@ O formulário de contato usa **Cloudflare Turnstile** para validar envios em `/a
 
 O deploy usa um Worker em `src/worker.js` com binding de assets estáticos. Isso é necessário para o Cloudflare liberar **Variables and Secrets**; Workers criados apenas com static assets não aceitam variáveis pelo painel.
 
-Configure estas variáveis no Cloudflare Pages:
+A `TURNSTILE_SITE_KEY` é lida pelo front via `/api/turnstile-config`. Como não é segredo (fica embutida no HTML do widget), ela é declarada em `vars` no `wrangler.jsonc` e versionada no repo — **não** cadastre-a só pelo painel: `wrangler deploy` sincroniza `vars` de forma declarativa a cada deploy e apaga qualquer variable que não esteja no arquivo.
 
-```txt
-TURNSTILE_SITE_KEY=site key do widget
-TURNSTILE_SECRET_KEY=secret key usada no siteverify
-```
-
-A `TURNSTILE_SITE_KEY` é lida pelo front via `/api/turnstile-config`. A `TURNSTILE_SECRET_KEY` fica apenas na Function server-side e nunca deve ser exposta no HTML ou JavaScript público.
-
-Se o painel ainda não mostrar o formulário de variáveis depois do deploy, configure pela CLI:
+A `TURNSTILE_SECRET_KEY` é segredo, fica só na Cloudflare (nunca no repo) e é configurada via CLI:
 
 ```sh
 npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
-A site key não é segredo. Ela pode ser cadastrada como variable `TURNSTILE_SITE_KEY` no painel depois do primeiro deploy com `main`, ou como `vars` no `wrangler.jsonc` para ambiente de teste.
+Secrets (`wrangler secret put`) não sofrem esse problema de sincronização — persistem entre deploys independente do `wrangler.jsonc`.
 
 Depois de validado pelo Turnstile, o envio é feito por e-mail via SMTP da Hostinger (`smtp.hostinger.com:465`), usando a lib [`worker-mailer`](https://github.com/zou-yu/worker-mailer) (TCP Sockets do Workers — exige `compatibility_flags: ["nodejs_compat"]` no `wrangler.jsonc`, já configurado). O Worker autentica e envia como `contato@temempiranga.com.br`, com `Reply-To` para o e-mail informado no formulário.
 
