@@ -378,6 +378,18 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   transition: background 0.15s, color 0.15s;
 }
 .btn-ligar:hover { background: var(--verde); color: white; }
+.btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: var(--verde);
+  border: 1.5px solid var(--verde);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-social:hover { background: var(--verde); color: white; }
 
 /* ─── vazio ──────────────────────────────────────────── */
 .vazio {
