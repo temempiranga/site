@@ -34,6 +34,7 @@ Edite `data/comercios.json` seguindo o modelo:
   "telefone": "3131999999",
   "whatsapp": "5531999999999",
   "instagram": "perfil_instagram",
+  "facebook": "perfil_facebook",
   "horario": "Seg–Sex, 8h–18h",
   "bairro": "Centro",
   "entrega_rural": false,
@@ -43,6 +44,8 @@ Edite `data/comercios.json` seguindo o modelo:
 ```
 
 **Categorias disponíveis:** Alimentação · Beleza · Mecânica · Saúde · Mercados · Construção · Serviços · Agro
+
+`instagram` e `facebook` são opcionais: informe apenas o usuário/handle (sem `@`, sem URL completa). Se o comércio não tiver a rede, omita o campo — a URL completa (`https://instagram.com/<usuário>` ou `https://facebook.com/<usuário>`) é montada automaticamente na renderização do card e da página individual, e entra no `sameAs` do schema `LocalBusiness`.
 
 ## Deploy
 
@@ -70,6 +73,16 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
 A site key não é segredo. Ela pode ser cadastrada como variable `TURNSTILE_SITE_KEY` no painel depois do primeiro deploy com `main`, ou como `vars` no `wrangler.jsonc` para ambiente de teste.
+
+Depois de validado pelo Turnstile, o envio é feito por e-mail via SMTP da Hostinger (`smtp.hostinger.com:465`), usando a lib [`worker-mailer`](https://github.com/zou-yu/worker-mailer) (TCP Sockets do Workers — exige `compatibility_flags: ["nodejs_compat"]` no `wrangler.jsonc`, já configurado). O Worker autentica e envia como `contato@temempiranga.com.br`, com `Reply-To` para o e-mail informado no formulário.
+
+Configure a senha da caixa como secret:
+
+```sh
+npx wrangler secret put CONTACT_SMTP_PASSWORD
+```
+
+Sem essa variável configurada, `/api/contact` responde `500` e não tenta enviar.
 
 ## Licença e dados
 

@@ -1,0 +1,11 @@
+.git
+.github
+.wrangler
+.claude
+node_modules
+src
+wrangler.jsonc
+package.json
+package-lock.json
+.gitignore
+*.patch

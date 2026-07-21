@@ -2,6 +2,7 @@
   "name": "site",
   "main": "src/worker.js",
   "compatibility_date": "2026-06-23",
+  "compatibility_flags": ["nodejs_compat"],
   // Keep Cloudflare preview URLs available for non-production deployments.
   "preview_urls": true,
   "assets": {
