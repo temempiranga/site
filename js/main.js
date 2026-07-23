@@ -54,6 +54,48 @@ const ICONES_CAT = {
   'Agro':        '🌿',
 };
 
+/* ─── horários: string de exibição derivada de `horarios` ─ */
+const DIAS_ORDEM = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const DIAS_ABREV_PT = { Mo: 'Seg', Tu: 'Ter', We: 'Qua', Th: 'Qui', Fr: 'Sex', Sa: 'Sáb', Su: 'Dom' };
+
+function agruparDiasConsecutivos(dias) {
+  const indices = [...new Set(dias.map(d => DIAS_ORDEM.indexOf(d)))]
+    .filter(i => i !== -1)
+    .sort((a, b) => a - b);
+
+  const grupos = [];
+  let atual = [];
+  for (const i of indices) {
+    if (atual.length === 0 || i === atual[atual.length - 1] + 1) {
+      atual.push(i);
+    } else {
+      grupos.push(atual);
+      atual = [i];
+    }
+  }
+  if (atual.length > 0) grupos.push(atual);
+  return grupos;
+}
+
+function formatarDias(dias) {
+  return agruparDiasConsecutivos(dias)
+    .map(grupo => {
+      const inicio = DIAS_ABREV_PT[DIAS_ORDEM[grupo[0]]];
+      const fim = DIAS_ABREV_PT[DIAS_ORDEM[grupo[grupo.length - 1]]];
+      return grupo.length > 1 ? `${inicio}–${fim}` : inicio;
+    })
+    .join(', ');
+}
+
+function formatarHorarios(item) {
+  if (!Array.isArray(item.horarios) || item.horarios.length === 0) {
+    return item.horario;
+  }
+  return item.horarios
+    .map(h => `${formatarDias(h.dias)}, ${h.abre}–${h.fecha}`)
+    .join('; ');
+}
+
 /* ─── estado ─────────────────────────────────────────── */
 let todosOsNegocios = [];
 let categoriaAtiva  = 'Todos';
@@ -161,7 +203,7 @@ function cardHTML(n) {
     <h2 class="card-nome"><a href="/comercio/${encodeURIComponent(n.id)}">${escapeHtml(n.nome)}</a></h2>
     <p class="card-desc">${escapeHtml(n.descricao)}</p>
     <div class="card-meta">
-      <span>🕐 ${escapeHtml(n.horario)}</span>
+      <span>🕐 ${escapeHtml(formatarHorarios(n))}</span>
       <span>📍 ${escapeHtml(n.endereco ? n.endereco + ', ' + n.bairro : n.bairro)}</span>
       ${rural}
     </div>
@@ -204,7 +246,7 @@ function redesSociaisHTML(n) {
   const links = socialLinks(n);
   if (links.length === 0) return '';
   return links
-    .map(l => `<a class="btn-social" data-rede="${l.tipo}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(n.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
+    .map(l => `<a class="btn-social" data-rede="${l.tipo}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener nofollow" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(n.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
     .join('');
 }
 
