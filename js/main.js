@@ -216,7 +216,9 @@ function cardHTML(n) {
         WhatsApp
       </a>
       <a class="btn-ligar" href="${telLink}" aria-label="Ligar para ${escapeHtml(n.nome)}">
-        📞
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+        </svg>
       </a>
       ${redes}
     </div>
@@ -244,7 +246,7 @@ function redesSociaisHTML(n) {
   const links = socialLinks(n);
   if (links.length === 0) return '';
   return links
-    .map(l => `<a class="btn-social" href="${escapeHtml(l.url)}" target="_blank" rel="noopener nofollow" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(n.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
+    .map(l => `<a class="btn-social" data-rede="${l.tipo}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener nofollow" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(n.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
     .join('');
 }
 
@@ -271,12 +273,14 @@ function bindAnalytics() {
   if (!grid) return;
 
   grid.addEventListener('click', e => {
-    const link = e.target.closest('.btn-wpp, .btn-ligar');
+    const link = e.target.closest('.btn-wpp, .btn-ligar, .btn-social');
     if (!link || typeof gtag !== 'function') return;
 
     const card = link.closest('.card');
     const nome = card ? card.querySelector('.card-nome')?.textContent : '';
-    const tipo = link.classList.contains('btn-wpp') ? 'whatsapp' : 'telefone';
+    const tipo = link.classList.contains('btn-wpp')   ? 'whatsapp'
+               : link.classList.contains('btn-ligar') ? 'telefone'
+               : (link.dataset.rede || 'social');
 
     gtag('event', 'clique_contato', {
       tipo_contato: tipo,
