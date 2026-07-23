@@ -345,9 +345,11 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   font-weight: 500;
   width: fit-content;
 }
-.card-acoes { display: flex; gap: 6px; }
+.card-acoes { display: flex; gap: 6px; align-items: stretch; }
+
 .btn-wpp {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -363,7 +365,12 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   transition: background 0.15s;
 }
 .btn-wpp:hover { background: var(--verde-dark); }
-.btn-ligar {
+
+.btn-ligar,
+.btn-social {
+  flex: 0 0 42px;
+  width: 42px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -371,25 +378,14 @@ button { cursor: pointer; font-family: var(--fonte-corpo); }
   color: var(--verde);
   border: 1.5px solid var(--verde);
   border-radius: var(--radius-sm);
-  padding: 9px 12px;
-  font-size: 0.82rem;
-  font-weight: 600;
   text-decoration: none;
   transition: background 0.15s, color 0.15s;
 }
-.btn-ligar:hover { background: var(--verde); color: white; }
-.btn-social {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  color: var(--verde);
-  border: 1.5px solid var(--verde);
-  border-radius: var(--radius-sm);
-  padding: 9px 12px;
-  transition: background 0.15s, color 0.15s;
-}
+.btn-ligar:hover,
 .btn-social:hover { background: var(--verde); color: white; }
+
+.btn-ligar svg,
+.btn-social svg { width: 18px; height: 18px; display: block; }
 
 /* ─── vazio ──────────────────────────────────────────── */
 .vazio {

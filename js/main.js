@@ -54,6 +54,48 @@ const ICONES_CAT = {
   'Agro':        '🌿',
 };
 
+/* ─── horários: string de exibição derivada de `horarios` ─ */
+const DIAS_ORDEM = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const DIAS_ABREV_PT = { Mo: 'Seg', Tu: 'Ter', We: 'Qua', Th: 'Qui', Fr: 'Sex', Sa: 'Sáb', Su: 'Dom' };
+
+function agruparDiasConsecutivos(dias) {
+  const indices = [...new Set(dias.map(d => DIAS_ORDEM.indexOf(d)))]
+    .filter(i => i !== -1)
+    .sort((a, b) => a - b);
+
+  const grupos = [];
+  let atual = [];
+  for (const i of indices) {
+    if (atual.length === 0 || i === atual[atual.length - 1] + 1) {
+      atual.push(i);
+    } else {
+      grupos.push(atual);
+      atual = [i];
+    }
+  }
+  if (atual.length > 0) grupos.push(atual);
+  return grupos;
+}
+
+function formatarDias(dias) {
+  return agruparDiasConsecutivos(dias)
+    .map(grupo => {
+      const inicio = DIAS_ABREV_PT[DIAS_ORDEM[grupo[0]]];
+      const fim = DIAS_ABREV_PT[DIAS_ORDEM[grupo[grupo.length - 1]]];
+      return grupo.length > 1 ? `${inicio}–${fim}` : inicio;
+    })
+    .join(', ');
+}
+
+function formatarHorarios(item) {
+  if (!Array.isArray(item.horarios) || item.horarios.length === 0) {
+    return item.horario;
+  }
+  return item.horarios
+    .map(h => `${formatarDias(h.dias)}, ${h.abre}–${h.fecha}`)
+    .join('; ');
+}
+
 /* ─── estado ─────────────────────────────────────────── */
 let todosOsNegocios = [];
 let categoriaAtiva  = 'Todos';
@@ -161,7 +203,7 @@ function cardHTML(n) {
     <h2 class="card-nome"><a href="/comercio/${encodeURIComponent(n.id)}">${escapeHtml(n.nome)}</a></h2>
     <p class="card-desc">${escapeHtml(n.descricao)}</p>
     <div class="card-meta">
-      <span>🕐 ${escapeHtml(n.horario)}</span>
+      <span>🕐 ${escapeHtml(formatarHorarios(n))}</span>
       <span>📍 ${escapeHtml(n.endereco ? n.endereco + ', ' + n.bairro : n.bairro)}</span>
       ${rural}
     </div>
@@ -174,7 +216,9 @@ function cardHTML(n) {
         WhatsApp
       </a>
       <a class="btn-ligar" href="${telLink}" aria-label="Ligar para ${escapeHtml(n.nome)}">
-        📞
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+        </svg>
       </a>
       ${redes}
     </div>
@@ -202,7 +246,7 @@ function redesSociaisHTML(n) {
   const links = socialLinks(n);
   if (links.length === 0) return '';
   return links
-    .map(l => `<a class="btn-social" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(n.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
+    .map(l => `<a class="btn-social" data-rede="${l.tipo}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener nofollow" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(n.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
     .join('');
 }
 
@@ -229,12 +273,14 @@ function bindAnalytics() {
   if (!grid) return;
 
   grid.addEventListener('click', e => {
-    const link = e.target.closest('.btn-wpp, .btn-ligar');
+    const link = e.target.closest('.btn-wpp, .btn-ligar, .btn-social');
     if (!link || typeof gtag !== 'function') return;
 
     const card = link.closest('.card');
     const nome = card ? card.querySelector('.card-nome')?.textContent : '';
-    const tipo = link.classList.contains('btn-wpp') ? 'whatsapp' : 'telefone';
+    const tipo = link.classList.contains('btn-wpp')   ? 'whatsapp'
+               : link.classList.contains('btn-ligar') ? 'telefone'
+               : (link.dataset.rede || 'social');
 
     gtag('event', 'clique_contato', {
       tipo_contato: tipo,

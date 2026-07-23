@@ -14,6 +14,74 @@ const SECURITY_HEADERS = {
 
 const COMERCIO_PATH_RE = /^\/comercio\/([^/]+)\/?$/;
 
+const CEP_PADRAO_PIRANGA = '36480-000';
+
+const DIAS_ORDEM = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const DIAS_ABREV_PT = { Mo: 'Seg', Tu: 'Ter', We: 'Qua', Th: 'Qui', Fr: 'Sex', Sa: 'Sáb', Su: 'Dom' };
+const DIAS_NOME_EN = {
+  Mo: 'Monday', Tu: 'Tuesday', We: 'Wednesday', Th: 'Thursday',
+  Fr: 'Friday', Sa: 'Saturday', Su: 'Sunday',
+};
+
+// Categorias que existem hoje em comercios.json e mapeiam com segurança para
+// um tipo schema.org mais específico. "Alimentação" fica de fora de propósito:
+// cobre padaria, restaurante e mercado (tipos diferentes) e não há campo de
+// subcategoria para desambiguar — ver relatório da Fase 0.
+const CATEGORIA_TIPO_SCHEMA = {};
+
+function tipoSchema(item) {
+  return CATEGORIA_TIPO_SCHEMA[item.categoria] || 'LocalBusiness';
+}
+
+/* ─── horários: string de exibição derivada de `horarios` ─ */
+function agruparDiasConsecutivos(dias) {
+  const indices = [...new Set(dias.map(d => DIAS_ORDEM.indexOf(d)))]
+    .filter(i => i !== -1)
+    .sort((a, b) => a - b);
+
+  const grupos = [];
+  let atual = [];
+  for (const i of indices) {
+    if (atual.length === 0 || i === atual[atual.length - 1] + 1) {
+      atual.push(i);
+    } else {
+      grupos.push(atual);
+      atual = [i];
+    }
+  }
+  if (atual.length > 0) grupos.push(atual);
+  return grupos;
+}
+
+function formatarDias(dias) {
+  return agruparDiasConsecutivos(dias)
+    .map(grupo => {
+      const inicio = DIAS_ABREV_PT[DIAS_ORDEM[grupo[0]]];
+      const fim = DIAS_ABREV_PT[DIAS_ORDEM[grupo[grupo.length - 1]]];
+      return grupo.length > 1 ? `${inicio}–${fim}` : inicio;
+    })
+    .join(', ');
+}
+
+function formatarHorarios(item) {
+  if (!Array.isArray(item.horarios) || item.horarios.length === 0) {
+    return item.horario;
+  }
+  return item.horarios
+    .map(h => `${formatarDias(h.dias)}, ${h.abre}–${h.fecha}`)
+    .join('; ');
+}
+
+function buildOpeningHoursSpecification(item) {
+  if (!Array.isArray(item.horarios) || item.horarios.length === 0) return undefined;
+  return item.horarios.map(h => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: h.dias.map(d => DIAS_NOME_EN[d]),
+    opens: h.abre,
+    closes: h.fecha,
+  }));
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -81,6 +149,36 @@ async function notFoundResponse(request, env) {
   return new Response(body, { status: 404, headers });
 }
 
+export function buildJsonLd(item, pageUrl) {
+  const redes = socialLinks(item);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': tipoSchema(item),
+    '@id': `${pageUrl}#business`,
+    name: item.nome,
+    description: item.descricao,
+    telephone: `+55${item.telefone}`,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: item.endereco || item.bairro,
+      addressLocality: 'Piranga',
+      addressRegion: 'MG',
+      addressCountry: 'BR',
+      postalCode: item.cep || CEP_PADRAO_PIRANGA,
+    },
+    url: pageUrl,
+  };
+  if (redes.length > 0) {
+    jsonLd.sameAs = redes.map(r => r.url);
+  }
+  const openingHoursSpecification = buildOpeningHoursSpecification(item);
+  if (openingHoursSpecification) {
+    jsonLd.openingHoursSpecification = openingHoursSpecification;
+  }
+  return jsonLd;
+}
+
 function renderComercioPage(item, origin) {
   const pageUrl = `${origin}/comercio/${encodeURIComponent(item.id)}`;
   const title = `${item.nome} — ${item.categoria} em Piranga, MG | Tem em Piranga`;
@@ -97,24 +195,7 @@ function renderComercioPage(item, origin) {
   const enderecoCompleto = item.endereco ? `${item.endereco}, ${item.bairro}` : item.bairro;
   const redes = socialLinks(item);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: item.nome,
-    description: item.descricao,
-    telephone: `+55${item.telefone}`,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: item.endereco || item.bairro,
-      addressLocality: 'Piranga',
-      addressRegion: 'MG',
-      addressCountry: 'BR',
-    },
-    url: pageUrl,
-  };
-  if (redes.length > 0) {
-    jsonLd.sameAs = redes.map(r => r.url);
-  }
+  const jsonLd = buildJsonLd(item, pageUrl);
   const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 
   return `<!DOCTYPE html>
@@ -149,7 +230,7 @@ function renderComercioPage(item, origin) {
     <a href="/" class="header-marca">
       <picture>
         <source type="image/webp" srcset="/img/icon-transparent.webp" />
-        <img src="/img/icon-transparent.png" alt="" class="header-marca-icon" aria-hidden="true" width="28" height="38" fetchpriority="high" />
+        <img src="/img/icon-transparent.png" alt="" class="header-marca-icon" aria-hidden="true" width="28" height="38" />
       </picture>
       <div>
         <div class="logo">Tem em <span>Piranga</span></div>
@@ -180,7 +261,7 @@ function renderComercioPage(item, origin) {
       <h1 class="card-nome">${escapeHtml(item.nome)}</h1>
       <p class="card-desc">${escapeHtml(item.descricao)}</p>
       <div class="card-meta">
-        <span>🕐 ${escapeHtml(item.horario)}</span>
+        <span>🕐 ${escapeHtml(formatarHorarios(item))}</span>
         <span>📍 ${escapeHtml(enderecoCompleto)}</span>
         ${rural}
       </div>
@@ -236,7 +317,7 @@ function redesSociaisHTML(item) {
   const links = socialLinks(item);
   if (links.length === 0) return '';
   return links
-    .map(l => `<a class="btn-social" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(item.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
+    .map(l => `<a class="btn-social" href="${escapeHtml(l.url)}" target="_blank" rel="noopener nofollow" aria-label="${l.tipo === 'instagram' ? 'Instagram' : 'Facebook'} de ${escapeHtml(item.nome)}">${ICONES_SOCIAL_SVG[l.tipo]}</a>`)
     .join('');
 }
 
