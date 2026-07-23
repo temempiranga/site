@@ -16,7 +16,14 @@
     "entrega_rural": false,
     "destaque": false,
     "ativo": true,
-    "atualizado_em": "2026-07-14"
+    "atualizado_em": "2026-07-14",
+    "midia": {
+      "logo": "/img/c/boleria-forninho/logo.webp",
+      "capa": "/img/c/boleria-forninho/capa.jpg"
+    },
+    "redes": {
+      "instagram": "https://instagram.com/forninho_pizzas.boleria"
+    }
   },
   {
     "id": "forninho-pizzas",
